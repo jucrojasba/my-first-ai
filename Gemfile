@@ -37,7 +37,14 @@ gem "bootsnap", require: false
 # Gem dotenv
 gem "dotenv-rails"
 
+# Sidekiq y Redis para trabajos en segundo plano
+gem "sidekiq"
 
+# TailwindCSS para estilos
+gem "tailwindcss-rails"
+
+# OpenAI SDK para interactuar con la API
+gem "ruby-openai"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
