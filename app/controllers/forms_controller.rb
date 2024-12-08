@@ -23,14 +23,16 @@ class FormsController < ApplicationController
   def create
     @form = Form.new(form_params)
 
-    respond_to do |format|
-      if @form.save
-        format.html { redirect_to @form, notice: "Form was successfully created." }
-        format.json { render :show, status: :created, location: @form }
+    if @form.save
+      if params[:form][:processed_in_job] == "true"
+        ResponseJob.perform_later(@form.id)
+        redirect_to forms_path, notice: "Formulario en proceso. Se te notificará por correo."
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @form.errors, status: :unprocessable_entity }
+        process_response(@form)
+        redirect_to @form, notice: "Formulario procesado exitosamente."
       end
+    else
+      render :new
     end
   end
 
@@ -66,5 +68,16 @@ class FormsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def form_params
       params.require(:form).permit(:name, :description, :processed_in_job)
+    end
+
+    def process_response(form)
+      response = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"]).completions(
+        parameters: {
+          model: "text-davinci-003",
+          prompt: "Contexto: #{form.name} - #{form.description}",
+          max_tokens: 100
+        }
+      )
+      form.create_response(ai_response: response["choices"].first["text"], status: "completed")
     end
 end
