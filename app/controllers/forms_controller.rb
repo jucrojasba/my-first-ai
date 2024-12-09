@@ -1,5 +1,5 @@
 class FormsController < ApplicationController
-  before_action :set_form, only: %i[ show edit update destroy ]
+  before_action :set_form, only: %i[show edit update destroy]
 
   # GET /forms or /forms.json
   def index
@@ -24,7 +24,8 @@ class FormsController < ApplicationController
     @form = Form.new(form_params)
 
     if @form.save
-      if params[:form][:processed_in_job] == "true"
+      # Verifica si el formulario debe ser procesado por un job
+      if params[:form].present? && params[:form][:processed_in_job] == "true"
         ResponseJob.perform_later(@form.id)
         redirect_to forms_path, notice: "Formulario en proceso. Se te notificará por correo."
       else
@@ -40,7 +41,7 @@ class FormsController < ApplicationController
   def update
     respond_to do |format|
       if @form.update(form_params)
-        format.html { redirect_to @form, notice: "Form was successfully updated." }
+        format.html { redirect_to @form, notice: "Formulario actualizado exitosamente." }
         format.json { render :show, status: :ok, location: @form }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -54,7 +55,7 @@ class FormsController < ApplicationController
     @form.destroy!
 
     respond_to do |format|
-      format.html { redirect_to forms_path, status: :see_other, notice: "Form was successfully destroyed." }
+      format.html { redirect_to forms_path, status: :see_other, notice: "Formulario destruido exitosamente." }
       format.json { head :no_content }
     end
   end

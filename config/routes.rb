@@ -1,15 +1,17 @@
 Rails.application.routes.draw do
-  resources :forms
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Rutas para la gestión de formularios
+  resources :forms, only: [:index, :show, :edit, :update, :destroy] do
+    # La ruta para crear un nuevo formulario y procesar la creación
+    post "", to: "forms#create", as: :create
+  end
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Verificar el estado de la aplicación
+  get "up", to: "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/*
-  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  # Rutas dinámicas para archivos de PWA
+  get "service-worker", to: "rails/pwa#service_worker", as: :pwa_service_worker
+  get "manifest", to: "rails/pwa#manifest", as: :pwa_manifest
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Define la raíz de la aplicación
+  root "forms#index"
 end
